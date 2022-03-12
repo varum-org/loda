@@ -19,7 +19,7 @@ dependencies:
         ref: master
 ```
 
-Examples
+Ex 1:
 
 ```dart
 import 'package:loda/loda.dart';
@@ -64,6 +64,54 @@ final profiles = [
   ]);
   final countries = getCountriesOfEligibleProfiles(profiles);
   print(countries); // [QN, ĐL]
+```
+
+Ex 2:
+
+```dart
+import 'package:loda/src/curry/curry.dart';
+import 'package:loda/src/maybe.dart';
+import 'package:collection/collection.dart';
+
+  final profile = [
+    {
+      "id": "1",
+      "address": {
+        "city": "DN",
+      },
+      "name": "Duy Nguyen",
+    },
+    {
+      "id": "2",
+      "name": "Minh D",
+      "address": {
+        "city": "DL",
+      }
+    },
+    {
+      "id": "3",
+      "name": 'Monad',
+    }
+  ];
+
+  Maybe findMaybe(List? entries, id) {
+    final result = entries?.firstWhereOrNull((obj) => obj["id"] == id);
+    return Maybe(result);
+  }
+
+  Function get = curry((key, obj) => Maybe(obj[key]));
+
+  toLowerCase(String str) => str.toLowerCase();
+
+  findProfileWithId(id) => findMaybe(profile, id)
+      .flatMap(get("address"))
+      .flatMap(get("city"))
+      .map(toLowerCase)
+      .unwrap();
+
+  print(findProfileWithId("1"));
+
+  print(findProfileWithId("3"));
 ```
 
 ## Additional information
