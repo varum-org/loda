@@ -8,9 +8,24 @@ The loda module is a combination of the two Lodash and Ramda modules. It promote
 
 ## Usage
 
+install
+
+```dart
+# pubspec.yaml
+dependencies:
+  loda:
+      git:
+        url: https://github.com/VTNPlusD/loda
+        ref: master
+```
+
 Examples
 
 ```dart
+import 'package:loda/loda.dart';
+
+const _ = LodaConstants.placeholder;
+
 final profiles = [
     {
       "name": "John",
