@@ -13,6 +13,9 @@ export './src/has.dart';
 export './src/lt.dart';
 export './src/or.dart';
 export './src/select.dart';
+export './src/just.dart';
+export './src/maybe.dart';
+export './src/nothing.dart';
 
 // utils
 export './src/utils/constants.dart';
