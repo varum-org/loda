@@ -3,15 +3,15 @@ import 'utils/is_nil.dart';
 
 Function map = curry((transform, entries) {
   if (isNil(entries)) return null;
-  var result = null;
+  dynamic result;
   if (entries is List) {
     result = [];
     for (var v in entries) {
-      result.add(transform(v));
+      (result as List).add(transform(v));
     }
   } else if (entries is Map) {
     result = {};
-    entries.map((k, v) => result.addAll(transform(k, v)));
+    entries.forEach((k, v) => (result as Map).addAll(transform(k, v)));
   } else {
     result = transform(entries);
   }

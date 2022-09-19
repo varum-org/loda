@@ -1,7 +1,7 @@
 name: loda
 description: The loda module is a combination of the two Lodash and Ramda modules. It promotes a more functional programming (FP) friendly style by exporting an instance of loda with its methods wrapped to produce immutable auto-curried iteratee-first data-last methods.
-version: 0.0.1
-homepage: https://www.facebook.com/duynn100198/
+version: 1.0.1
+homepage: https://github.com/VTNPlusD/loda
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -17,6 +17,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^1.0.0
+  collection: ^1.15.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

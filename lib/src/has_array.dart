@@ -1,8 +1,8 @@
 import 'utils/has_key.dart';
 import 'utils/is_nil.dart';
 
-hasFromArray(path, obj) {
-  if (path.length == 0 || isNil(obj)) {
+hasFromArray(List path, obj) {
+  if (path.isEmpty || isNil(obj)) {
     return false;
   }
   var val = obj;

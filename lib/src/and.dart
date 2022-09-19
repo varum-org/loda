@@ -1,11 +1,5 @@
-bool Function(dynamic) and(functions) {
+bool Function(dynamic) and(List<Function> functions) {
   final length = functions.length;
-  var index = length;
-  while (index-- > 0) {
-    if (functions[index] is! Function) {
-      throw TypeError();
-    }
-  }
   return (arg) {
     var index = 0;
     if (arg == null) {

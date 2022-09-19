@@ -1,8 +1,8 @@
 import '../utils/is_nil.dart';
 import 'curry.dart';
 
-Function curry5 = (Function fn) => (a, [b, c, d, e]) {
-      final call = (a, b, c, d, e) => fn(a, b, c, d, e);
+Function curry5(Function fn) => (a, [b, c, d, e]) {
+      call(a, b, c, d, e) => fn(a, b, c, d, e);
       if (isNil(b)) {
         return curry(([b, c, d, e]) => call(a, b, c, d, e), argsLength: 4);
       }

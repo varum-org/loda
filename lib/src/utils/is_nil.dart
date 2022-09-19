@@ -1,1 +1,1 @@
-bool isNil(source) => ["", null, false, 0].contains(source);
+bool isNil(dynamic source) => ["", null, false, 0].contains(source);

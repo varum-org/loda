@@ -63,55 +63,63 @@ final profiles = [
     distinct,
   ]);
   final countries = getCountriesOfEligibleProfiles(profiles);
-  print(countries); // [QN, ĐL]
+  print(countries); // [DN, QN]
 ```
 
 Ex 2:
 
 ```dart
-import 'package:loda/src/curry/curry.dart';
-import 'package:loda/src/maybe.dart';
+import 'package:loda/loda.dart';
 import 'package:collection/collection.dart';
 
-  final profile = [
-    {
-      "id": "1",
-      "address": {
-        "city": "DN",
+   final profiles = [
+      {
+        "id": "1",
+        "address": {
+          "city": "DN",
+        },
+        "name": "Duy Nguyen",
       },
-      "name": "Duy Nguyen",
-    },
-    {
-      "id": "2",
-      "name": "Minh D",
-      "address": {
-        "city": "DL",
+      {
+        "id": "2",
+        "name": "Minh D",
+        "address": {
+          "city": "DL",
+        }
+      },
+      {
+        "id": "3",
+        "name": 'Monad',
+        "address": {
+          "city": null,
+        }
       }
-    },
-    {
-      "id": "3",
-      "name": 'Monad',
+    ];
+    Maybe<Map> findMaybe(List<Map>? entries, id) {
+      final result = entries?.firstWhereOrNull(
+        (obj) => obj["id"] == id,
+      );
+      return (result?.isNotEmpty ?? false)
+          ? Maybe.some(result)
+          : Maybe.nothing();
     }
-  ];
 
-  Maybe findMaybe(List? entries, id) {
-    final result = entries?.firstWhereOrNull((obj) => obj["id"] == id);
-    return Maybe(result);
-  }
+    Function get = curry(
+      (key, obj) =>
+          obj.containsKey(key) ? Maybe.some(obj[key]) : Maybe.nothing(),
+    );
 
-  Function get = curry((key, obj) => Maybe(obj[key]));
+    toLowerCase(String str) => str.toLowerCase();
 
-  toLowerCase(String str) => str.toLowerCase();
+    findProfileWithId(id) => findMaybe(profiles, id)
+        .flatMap(get("address"))
+        .flatMap(get("city"))
+        .map(toLowerCase)
+        .unwrap();
 
-  findProfileWithId(id) => findMaybe(profile, id)
-      .flatMap(get("address"))
-      .flatMap(get("city"))
-      .map(toLowerCase)
-      .unwrap();
+  print(findProfileWithId("1")); // dn
 
-  print(findProfileWithId("1"));
-
-  print(findProfileWithId("3"));
+  print(findProfileWithId("3")); // null
 ```
 
 ## Additional information

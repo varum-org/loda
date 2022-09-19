@@ -8,14 +8,14 @@ import 'curry3.dart';
 import 'curry4.dart';
 import 'curry5.dart';
 
-Function curry(Function fn, {int argsLength: 2}) {
+Function curry(Function fn, {int argsLength = 2}) {
   assert(argsLength <= 5);
   return <T, E, A, B, C>([T? a, E? b, A? c, B? d, C? e]) {
-    final hasPlaceholder = (value) => value == LodaConstants.placeholder;
-    final hasFullValue = (args) => List.of(args).length == argsLength;
-    final hasNotPlaceholder = (values) => List.of(values).length == 0;
-    final valuesNotNull = (args) => args.where(isNotNil);
-    final valuesHasPlaceholder = (args) => args.where(hasPlaceholder);
+    hasPlaceholder(value) => value == LodaConstants.placeholder;
+    hasFullValue(args) => List.of(args).length == argsLength;
+    hasNotPlaceholder(values) => List.of(values).isEmpty;
+    valuesNotNull(args) => args.where(isNotNil);
+    valuesHasPlaceholder(args) => args.where(hasPlaceholder);
     final args = valuesNotNull([a, b, c, d, e]).toList();
     final isEligible = flow([
       valuesNotNull,

@@ -3,11 +3,11 @@ import 'utils/is_nil.dart';
 
 Function flatMap = curry((transform, entries) {
   if (isNil(entries)) return null;
-  var result = null;
+  dynamic result;
   if (entries is List) {
     result = [];
     for (var e in entries) {
-      result.addAll(e);
+      (result as List).addAll(e);
     }
   } else {
     result = transform(entries);

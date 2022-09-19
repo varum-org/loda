@@ -4,13 +4,13 @@ import 'package:dartx/dartx.dart';
 
 Function mapIndexed = curry((transform, entries) {
   if (isNil(entries)) return null;
-  var result = null;
+  dynamic result;
   if (entries is List) {
     result = [];
-    result.addAll(entries.mapIndexed((i, v) => transform(v, i)));
+    (result as List).addAll(entries.mapIndexed((i, v) => transform(v, i)));
   } else if (entries is Map) {
     result = {};
-    entries.map((k, v) => result.addAll(transform(k, v)));
+    entries.forEach((k, v) => (result as Map).addAll(transform(k, v)));
   } else {
     result = transform(entries);
   }

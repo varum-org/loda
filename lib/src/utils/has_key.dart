@@ -1,1 +1,1 @@
-bool hasKey(key, object) => object != null && object.containsKey(key);
+bool hasKey(key, Map? object) => object != null && object.containsKey(key);

@@ -1,3 +1,3 @@
 import 'is_nil.dart';
 
-bool isNotNil(source) => !isNil(source);
+bool isNotNil(dynamic source) => !isNil(source);
