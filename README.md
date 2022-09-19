@@ -13,10 +13,7 @@ install
 ```dart
 # pubspec.yaml
 dependencies:
-  loda:
-      git:
-        url: https://github.com/VTNPlusD/loda
-        ref: master
+  loda: ^1.0.2
 ```
 
 Ex 1:
