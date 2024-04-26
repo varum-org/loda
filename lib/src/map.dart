@@ -1,7 +1,7 @@
 import 'curry/curry.dart';
 import 'utils/is_nil.dart';
 
-Function map = curry((transform, entries) {
+Function fmap = curry((transform, entries) {
   if (isNil(entries)) return null;
   dynamic result;
   if (entries is List) {
