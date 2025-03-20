@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:loda/loda.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('Placeholder Operator Tests', () {
