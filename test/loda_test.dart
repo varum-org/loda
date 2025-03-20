@@ -1,152 +1,67 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:loda/loda.dart';
-import 'package:loda/src/curry/curry3.dart';
-import 'package:collection/collection.dart';
-
-const _ = LodaConstants.placeholder;
 
 void main() {
-  test('Functor', () {
-    num plus(num x) => x + 1;
-    expect(Just(2).map(plus), Just(3));
-    expect(Nothing<num>().map(plus), Nothing());
-    expect([1, 2, 3].map((x) => x + 2), [3, 4, 5]);
-    final foo = map<int>((x) => x + 3, (x) => x + 2);
-    expect(foo(10), 15);
-  });
-
-  test('Aplicatives', () {
-    expect(Just(2).apply(Just((x) => x + 3)), Just(5));
-    expect(
-        [1, 2, 3].mMap<int, int>([
-          (x) => x * 2,
-          (x) => x + 3,
-        ]),
-        [2, 4, 6, 4, 5, 6]);
-    curriedAddition(num x) => (num y) => x + y;
-    final a = Just(3).map(curriedAddition); // Just<(int) => int>
-    // Just(5).map(a); // COMPILATION ERROR
-    expect(Just(5).apply(a), 15);
-    curriedTimes(int x) => (int y) => x * y;
-    // num Function(num) curriedTimes(num x) => (num y) => x * y;
-    expect(Just(5).apply(Just(3).map(curriedTimes)), Just(15));
-  });
-
-  test('Monads', () {
-    Maybe<num> half(num a) => a % 2 == 0 ? Just(a / 2) : Nothing();
-    expect(Just(3).flatMap(half), Nothing());
-    expect(Just(4).flatMap(half), Just(2));
-    expect(Nothing<num>().flatMap(half), Nothing());
-    expect(Just(20).flatMap(half).flatMap(half).flatMap(half), Nothing());
-  });
-
-  test('VD 1', () {
-    final profiles = [
-      {
-        "name": "John",
-        "age": 19,
-        "address": {
-          "country": "DN",
-        },
-      },
-      {
-        "name": "Michel",
-        "age": 18,
-        "address": {
-          "country": "QN",
-        },
-      },
-      {
-        "name": "Cel",
-        "age": 17,
-        "address": {
-          "country": 'ĐL',
-        },
-      },
-    ];
-    final bool Function(dynamic) isEligible = and([
-      has('name'),
-      has('age'),
-      flow([
-        select('age'),
-        gte(_, 18),
-      ]),
-    ]);
-    final getCountriesOfEligibleProfiles = flow([
-      filter(isEligible),
-      fmap(select('address.country')),
-      distinct,
-    ]);
-    final countries = getCountriesOfEligibleProfiles(profiles);
-    expect(countries, ["DN", "QN"]);
-  });
-
-  test('VD 2', () {
-    final profiles = [
-      {
-        "id": "1",
-        "address": {
-          "city": "DN",
-        },
-        "name": "Duy Nguyen",
-      },
-      {
-        "id": "2",
-        "name": "Minh D",
-        "address": {
-          "city": "DL",
-        }
-      },
-      {
-        "id": "3",
-        "name": 'Monad',
-      }
-    ];
-    final findBy = curry3((String key, String id, List entries) {
-      final result = entries.firstWhereOrNull(
-        (obj) => obj[key] == id,
-      );
-      return isNotNil(result) && (result?.isNotEmpty ?? false)
-          ? Just(result!)
-          : Nothing();
+  group('Placeholder Operator Tests', () {
+    test('>= operator', () {
+      final greaterThanOrEqual = FP.p >= 5;
+      expect(greaterThanOrEqual(6), isTrue);
+      expect(greaterThanOrEqual(5), isTrue);
+      expect(greaterThanOrEqual(4), isFalse);
     });
 
-    final findById = findBy("id");
-
-    Maybe Function(dynamic) get(String key) =>
-        (obj) => (obj.containsKey(key) ? Just(obj[key]) : Nothing());
-
-    String toLowerCase(str) => str.toLowerCase();
-
-    findProfileWithId(id) => Just(profiles)
-        .flatMap(findById(id))
-        .flatMap(get("address"))
-        .flatMap(get("city"))
-        .map<String>(toLowerCase)
-        .unwrap();
-
-    expect(findProfileWithId("1"), 'dn');
-    // expect(findProfileWithId("3"), null);
+    test('> operator', () {
+      final greaterThan = FP.p > 5;
+      expect(greaterThan(6), isTrue);
+      expect(greaterThan(5), isFalse);
+      expect(greaterThan(4), isFalse);
+    });
   });
-}
 
-// Helpers
-typedef IntFunction<T> = T Function(T);
-IntFunction<T> map<T>(IntFunction<T> f, IntFunction<T> g) => (x) => f(g(x));
+  group('Pipeline Tests', () {
+    test('Pipeline chaining', () {
+      final pipeline = Pipeline<int, int>((x) => x * 2).then((x) => x + 3);
+      expect(pipeline(4), equals(11));
+    });
 
-extension ApplicativeList on List {
-  Iterable<U> mMap<T, U>(List<U Function(T)> list) sync* {
-    for (final item in list) {
-      for (var i = 0; i < length; i++) {
-        yield item(this[i]);
-      }
-    }
-  }
+    test('Pipeline with Either', () {
+      final pipeline = Pipeline<int, Either<String, int>>(
+          (x) => x > 0 ? Right(x * 2) : const Left("Negative"));
+      expect(pipeline(3), equals(const Right(6)));
+      expect(pipeline(-1), equals(const Left("Negative")));
+    });
+  });
 
-  dynamic firstWhereOrNull(bool Function(dynamic element) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
-  }
+  group('FP Utility Tests', () {
+    test('and Predicate', () {
+      isEven(int x) => x % 2 == 0;
+      isPositive(int x) => x > 0;
+      final andPredicate = FP.and([isEven, isPositive]);
+      expect(andPredicate(4), isTrue);
+      expect(andPredicate(-4), isFalse);
+      expect(andPredicate(3), isFalse);
+    });
+
+    test('or Predicate', () {
+      isEven(int x) => x % 2 == 0;
+      isNegative(int x) => x < 0;
+      final orPredicate = FP.or([isEven, isNegative]);
+      expect(orPredicate(4), isTrue);
+      expect(orPredicate(-3), isTrue);
+      expect(orPredicate(3), isFalse);
+    });
+
+    test('filter', () {
+      final numbers = [1, 2, 3, 4, 5];
+      final filterEven = FP.filter<int>((x) => x % 2 == 0);
+      expect(filterEven(numbers), equals([2, 4]));
+    });
+
+    test('distinct', () {
+      final numbers = [1, 2, 2, 3, 4, 4, 5];
+      final distinctNumbers = FP.distinct<int>();
+      expect(distinctNumbers(numbers), equals([1, 2, 3, 4, 5]));
+    });
+  });
 }
