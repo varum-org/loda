@@ -1,69 +1,7 @@
 import 'dart:collection';
+
 import 'package:dartz/dartz.dart';
-
-class Placeholder {
-  const Placeholder();
-}
-
-extension ExtPlaceholder on Placeholder {
-  bool Function(num) operator >=(num b) => (num a) => a >= b;
-
-  bool Function(num) operator >(num b) => (num a) => a > b;
-
-  bool Function(num) operator <=(num b) => (num a) => a <= b;
-
-  bool Function(num) operator <(num b) => (num a) => a < b;
-}
-
-typedef Predicate<T> = bool Function(T value);
-
-class Pipeline<T, R> {
-  final R Function(T) run;
-
-  Pipeline(this.run);
-
-  Pipeline<T, S> then<S>(S Function(R) next) {
-    return Pipeline<T, S>((T input) => next(run(input)));
-  }
-
-  Pipeline<T, Either<L, S>> thenEither<L, S>(Either<L, S> Function(R) next) {
-    return Pipeline<T, Either<L, S>>((T input) => next(run(input)));
-  }
-
-  R call(T input) => run(input);
-}
-
-extension EitherPipelineExtension<L, T, R> on Pipeline<T, Either<L, R>> {
-  Pipeline<T, Either<L, S>> mapEitherRight<S>(S Function(R) f) {
-    return Pipeline<T, Either<L, S>>((T input) {
-      return run(input).fold(
-        Left.new,
-        (r) => Right(f(r)),
-      );
-    });
-  }
-
-  Pipeline<T, Either<L2, R>> mapEitherLeft<L2>(L2 Function(L) f) {
-    return Pipeline<T, Either<L2, R>>((T input) {
-      return run(input).fold(
-        (l) => Left(f(l)),
-        Right.new,
-      );
-    });
-  }
-
-  Pipeline<T, Either<L2, S>> mapEitherBoth<L2, S>(
-    L2 Function(L) f1,
-    S Function(R) f2,
-  ) {
-    return Pipeline<T, Either<L2, S>>((T input) {
-      return run(input).fold(
-        (l) => Left(f1(l)),
-        (r) => Right(f2(r)),
-      );
-    });
-  }
-}
+import 'package:loda/src/core.dart';
 
 class FP {
   static const p = Placeholder();
@@ -180,6 +118,67 @@ class FP {
   static Map<K, V> Function(Map<K, V>) distinctMap<K, V>() {
     return (Map<K, V> items) {
       return LinkedHashMap<K, V>.from(items);
+    };
+  }
+
+  static T Function(Iterable<T>) reduce<T>(
+    T Function(T previous, T current) reducer,
+  ) {
+    return (items) => items.reduce(reducer);
+  }
+
+  static Map<K, List<T>> Function(Iterable<T>) groupBy<T, K>(
+    K Function(T) keySelector,
+  ) {
+    return (items) {
+      final map = <K, List<T>>{};
+      for (final item in items) {
+        final key = keySelector(item);
+        map.putIfAbsent(key, () => []).add(item);
+      }
+      return map;
+    };
+  }
+
+  static (List<T>, List<T>) Function(Iterable<T>) partition<T>(
+    bool Function(T) predicate,
+  ) {
+    return (items) {
+      final pass = <T>[];
+      final fail = <T>[];
+      for (final item in items) {
+        (predicate(item) ? pass : fail).add(item);
+      }
+      return (pass, fail);
+    };
+  }
+
+  static R Function(T) ifElse<T, R>(
+    bool Function(T) predicate,
+    R Function(T) ifTrue,
+    R Function(T) ifFalse,
+  ) {
+    return (T input) => predicate(input) ? ifTrue(input) : ifFalse(input);
+  }
+
+  static R? Function(T) when<T, R>(
+    bool Function(T) predicate,
+    R Function(T) action,
+  ) {
+    return (T input) => predicate(input) ? action(input) : null;
+  }
+
+  static R Function(T) cond<T, R>(
+    List<(bool Function(T), R Function(T))> cases,
+    R Function(T) orElse,
+  ) {
+    return (T input) {
+      for (final caseEntry in cases) {
+        if (caseEntry.$1(input)) {
+          return caseEntry.$2(input);
+        }
+      }
+      return orElse(input);
     };
   }
 }

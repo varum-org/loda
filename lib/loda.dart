@@ -1,4 +1,5 @@
 library loda;
 
-export './src/loda.dart'
-    show FP, Pipeline, ExtPlaceholder, EitherPipelineExtension;
+export './src/extensions.dart';
+export './src/utils.dart';
+export './src/core.dart' show Pipeline;
